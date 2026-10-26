@@ -32,7 +32,9 @@ const AdminLogin = () => {
       const { error: signInError } = await signIn(email, password);
       
       if (signInError) {
-        setError("بيانات الدخول غير صحيحة");
+        setError(signInError.message === "خدمة تسجيل الدخول غير متاحة حالياً"
+          ? signInError.message
+          : "بيانات الدخول غير صحيحة");
         setIsSubmitting(false);
         return;
       }

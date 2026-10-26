@@ -44,6 +44,15 @@ const ContactSection = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!supabase) {
+      toast({
+        title: "الإرسال غير متاح حالياً",
+        description: "يرجى التواصل معنا مباشرة عبر الهاتف أو البريد الإلكتروني",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsSubmitting(true);
 
     const contactData = {
