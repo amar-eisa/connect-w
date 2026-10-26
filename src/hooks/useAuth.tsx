@@ -21,6 +21,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   // Server-side admin verification via edge function
   const verifyAdminServerSide = async (accessToken: string): Promise<boolean> => {
+    if (!supabase) return false;
+
     try {
       const response = await supabase.functions.invoke('verify-admin', {
         headers: {
@@ -41,6 +43,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   useEffect(() => {
+    if (!supabase) {
+      setIsLoading(false);
+      return;
+    }
+
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
@@ -71,12 +78,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setIsAdmin(adminStatus);
       }
       setIsLoading(false);
+    }).catch(() => {
+      setSession(null);
+      setUser(null);
+      setIsAdmin(false);
+      setIsLoading(false);
     });
 
     return () => subscription.unsubscribe();
   }, []);
 
   const signIn = async (email: string, password: string) => {
+    if (!supabase) {
+      return { error: new Error("خدمة تسجيل الدخول غير متاحة حالياً") };
+    }
+
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -85,7 +101,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    await supabase?.auth.signOut();
     setUser(null);
     setSession(null);
     setIsAdmin(false);

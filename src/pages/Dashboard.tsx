@@ -53,6 +53,7 @@ const Dashboard = () => {
   const fetchRequests = async () => {
     setLoading(true);
     try {
+      if (!supabase) throw new Error("خدمة البيانات غير متاحة حالياً");
       const { data, error } = await supabase
         .from("contact_requests")
         .select("*")
@@ -76,6 +77,7 @@ const Dashboard = () => {
 
   const updateStatus = async (id: string, newStatus: string) => {
     try {
+      if (!supabase) throw new Error("خدمة البيانات غير متاحة حالياً");
       const { error } = await supabase
         .from("contact_requests")
         .update({ status: newStatus })
